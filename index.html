@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Video Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-4">
+  <!-- Header -->
+  <h1 class="text-3xl font-bold mb-4">🎥 AI Video Generator</h1>
+
+  <!-- Prompt Input -->
+  <div class="w-full max-w-2xl mb-4">
+    <label class="block mb-2 font-semibold">Prompt</label>
+    <textarea id="prompt" class="w-full p-2 rounded bg-gray-800 border border-gray-700 focus:outline-none" rows="4" placeholder="Describe your video idea..."></textarea>
+  </div>
+
+  <!-- Video Type -->
+  <div class="w-full max-w-2xl mb-4">
+    <label class="block mb-2 font-semibold">Video Type</label>
+    <select id="videoType" class="w-full p-2 rounded bg-gray-800 border border-gray-700">
+      <option value="meme">😂 Meme</option>
+      <option value="commentary">🗣️ Commentary</option>
+      <option value="tech">💻 Tech Showcase</option>
+      <option value="music">🎵 Music Video</option>
+    </select>
+  </div>
+
+  <!-- API Key Settings Button -->
+  <button id="settingsBtn" class="mb-4 px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded">⚙️ API Settings</button>
+
+  <!-- Generate Button -->
+  <button id="generateBtn" class="px-6 py-3 bg-green-600 hover:bg-green-500 rounded text-lg font-bold">🚀 Generate Video</button>
+
+  <!-- Progress Log -->
+  <div class="w-full max-w-2xl mt-6">
+    <h2 class="font-bold mb-2">Progress</h2>
+    <div id="progressLog" class="bg-gray-800 p-4 rounded h-64 overflow-y-auto text-sm font-mono"></div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-gray-900 p-6 rounded w-96">
+      <h2 class="text-xl font-bold mb-4">API Keys</h2>
+      <label class="block mb-2">SDXL API Key</label>
+      <input id="sdxlKey" type="text" class="w-full p-2 rounded bg-gray-800 border border-gray-700 mb-3">
+      <label class="block mb-2">Runway API Key</label>
+      <input id="runwayKey" type="text" class="w-full p-2 rounded bg-gray-800 border border-gray-700 mb-3">
+      <label class="block mb-2">GPT API Key</label>
+      <input id="gptKey" type="text" class="w-full p-2 rounded bg-gray-800 border border-gray-700 mb-3">
+      <label class="block mb-2">TTS API Key</label>
+      <input id="ttsKey" type="text" class="w-full p-2 rounded bg-gray-800 border border-gray-700 mb-3">
+      <div class="flex justify-end gap-2">
+        <button id="saveSettings" class="px-4 py-2 bg-green-600 rounded">Save</button>
+        <button id="closeSettings" class="px-4 py-2 bg-red-600 rounded">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
