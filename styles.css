@@ -1,0 +1,26 @@
+/* styles.css */
+body {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    font-family: 'Inter', sans-serif;
+}
+
+button {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+}
+
+input, textarea, select {
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    color: white;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 2px rgba(56,189,248,0.5);
+}
