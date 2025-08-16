@@ -1,90 +1,41 @@
-// Elements
-const generateBtn = document.getElementById("generateBtn");
-const promptInput = document.getElementById("prompt");
-const videoTypeSelect = document.getElementById("videoType");
-const progressLog = document.getElementById("progressLog");
-const settingsBtn = document.getElementById("settingsBtn");
-const settingsModal = document.getElementById("settingsModal");
-const saveSettings = document.getElementById("saveSettings");
-const closeSettings = document.getElementById("closeSettings");
+import express from "express";
+import fetch from "node-fetch";
+import bodyParser from "body-parser";
 
-// API Key inputs
-const sdxlKeyInput = document.getElementById("sdxlKey");
-const runwayKeyInput = document.getElementById("runwayKey");
-const gptKeyInput = document.getElementById("gptKey");
-const ttsKeyInput = document.getElementById("ttsKey");
+const app = express();
+app.use(bodyParser.json());
 
-// Show settings modal
-settingsBtn.addEventListener("click", () => {
-  settingsModal.classList.remove("hidden");
-});
+const API_KEY = process.env.STABILITY_API_KEY;
 
-// Hide settings modal
-closeSettings.addEventListener("click", () => {
-  settingsModal.classList.add("hidden");
-});
-
-// Save API keys to local storage
-saveSettings.addEventListener("click", () => {
-  localStorage.setItem("sdxlKey", sdxlKeyInput.value);
-  localStorage.setItem("runwayKey", runwayKeyInput.value);
-  localStorage.setItem("gptKey", gptKeyInput.value);
-  localStorage.setItem("ttsKey", ttsKeyInput.value);
-  logProgress("✅ API Keys saved.");
-  settingsModal.classList.add("hidden");
-});
-
-// Load stored API keys
-window.addEventListener("load", () => {
-  sdxlKeyInput.value = localStorage.getItem("sdxlKey") || "";
-  runwayKeyInput.value = localStorage.getItem("runwayKey") || "";
-  gptKeyInput.value = localStorage.getItem("gptKey") || "";
-  ttsKeyInput.value = localStorage.getItem("ttsKey") || "";
-});
-
-// Progress logger
-function logProgress(msg) {
-  const time = new Date().toLocaleTimeString();
-  progressLog.innerHTML += `[${time}] ${msg}<br>`;
-  progressLog.scrollTop = progressLog.scrollHeight;
-}
-
-// Generate video
-generateBtn.addEventListener("click", async () => {
-  const prompt = promptInput.value;
-  const videoType = videoTypeSelect.value;
-
-  if (!prompt) {
-    logProgress("❌ Please enter a prompt.");
-    return;
-  }
-
-  logProgress(`🚀 Sending request for "${videoType}" video...`);
+app.post("/generate", async (req, res) => {
+  const { prompt } = req.body;
 
   try {
-    const res = await fetch("/generate", {
+    const response = await fetch("https://api.stability.ai/v2beta/stable-image/generate/sd3", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Authorization": `Bearer ${API_KEY}`,
+        "Accept": "application/json"
       },
       body: JSON.stringify({
         prompt,
-        videoType,
-        sdxlKey: localStorage.getItem("sdxlKey"),
-        runwayKey: localStorage.getItem("runwayKey"),
-        gptKey: localStorage.getItem("gptKey"),
-        ttsKey: localStorage.getItem("ttsKey")
+        output_format: "png"
       })
     });
 
-    const data = await res.json();
-    if (data.status === "ok") {
-      logProgress("✅ Video generated successfully!");
-      logProgress(`📹 Download: ${data.videoUrl}`);
-    } else {
-      logProgress(`❌ Error: ${data.error}`);
+    if (!response.ok) {
+      const err = await response.text();
+      return res.status(500).json({ error: err });
     }
-  } catch (err) {
-    logProgress(`❌ Request failed: ${err.message}`);
+
+    const result = await response.json();
+    res.json(result);
+  } catch (error) {
+    console.error("Error generating image:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
+});
+
+app.listen(3000, () => {
+  console.log("Server running on port 3000");
 });
