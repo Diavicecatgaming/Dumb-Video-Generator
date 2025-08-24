@@ -1,67 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Weird Video Studio</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Image Generator (SDXL)</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #111; color: #eee; text-align: center; margin: 0; padding: 20px; }
+    h1 { color: #00ffea; }
+    input, button { padding: 10px; font-size: 16px; margin: 10px; border-radius: 8px; border: none; }
+    button { background: #00ffea; color: #000; cursor: pointer; }
+    button:hover { background: #00ccbb; }
+    img { margin-top: 20px; max-width: 90%; border: 2px solid #00ffea; border-radius: 12px; }
+    .loading { font-size: 18px; color: #ff0; margin-top: 20px; }
+  </style>
 </head>
-<body class="text-white">
-    <div class="max-w-4xl mx-auto p-8">
-        <h1 class="text-4xl font-bold mb-6">🎬 Weird Video Studio</h1>
+<body>
+  <h1>AI Image Generator (SDXL)</h1>
+  <input type="text" id="prompt" placeholder="Enter a prompt..." size="50">
+  <button onclick="generateImage()">Generate</button>
+  <div id="status"></div>
+  <img id="result" />
 
-        <!-- Prompt -->
-        <label class="block mb-2 font-semibold">Prompt</label>
-        <textarea id="prompt" class="w-full p-3 rounded mb-4" placeholder="Describe your video idea..."></textarea>
+  <script>
+    async function generateImage() {
+      const prompt = document.getElementById('prompt').value;
+      if (!prompt) return alert("Enter a prompt first!");
+      
+      document.getElementById('status').innerText = "Generating...";
+      document.getElementById('result').src = "";
 
-        <!-- Video type -->
-        <label class="block mb-2 font-semibold">Video Type</label>
-        <select id="videoType" class="w-full p-3 rounded mb-4">
-            <option value="meme">Meme</option>
-            <option value="commentary">Commentary</option>
-            <option value="tech">Tech Showcase</option>
-            <option value="music">Music Video</option>
-        </select>
+      const response = await fetch(
+        "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0",
+        {
+          method: "POST",
+          headers: { "Authorization": "Bearer hf_FakeFreeKeyHere" },
+          body: JSON.stringify({ inputs: prompt })
+        }
+      );
 
-        <!-- Generate button -->
-        <button id="generateBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded font-bold">
-            Generate
-        </button>
+      if (!response.ok) {
+        document.getElementById('status').innerText = "Error: " + response.statusText;
+        return;
+      }
 
-        <!-- Progress -->
-        <div id="status" class="mt-6 text-lg"></div>
-
-        <!-- Output -->
-        <video id="outputVideo" controls class="mt-6 w-full rounded shadow-lg hidden"></video>
-    </div>
-
-    <script>
-        document.getElementById("generateBtn").addEventListener("click", async () => {
-            const prompt = document.getElementById("prompt").value;
-            const videoType = document.getElementById("videoType").value;
-            const status = document.getElementById("status");
-            const outputVideo = document.getElementById("outputVideo");
-
-            status.innerText = "Generating video...";
-            outputVideo.classList.add("hidden");
-
-            const res = await fetch("/generate", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ prompt, videoType })
-            });
-
-            if (!res.ok) {
-                status.innerText = "Error generating video.";
-                return;
-            }
-
-            const data = await res.json();
-            status.innerText = "Done!";
-            outputVideo.src = data.video_url;
-            outputVideo.classList.remove("hidden");
-        });
-    </script>
+      const blob = await response.blob();
+      document.getElementById('result').src = URL.createObjectURL(blob);
+      document.getElementById('status').innerText = "Done!";
+    }
+  </script>
 </body>
 </html>
-
